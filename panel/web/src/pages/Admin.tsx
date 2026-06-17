@@ -1656,9 +1656,11 @@ function CreateUser({ instances, onClose, onDone }: { instances: InstanceWithSta
   );
 }
 
-// 可创建的应用类型。ready=false 的暂时禁用（即将支持）。Telegram（仅 x86_64）与其它应用暂缓。
+// 可创建的应用类型。ready=false 的暂时禁用（即将支持）。
+// Telegram 官方仅提供 x86_64(amd64) 版本；安装脚本对非 amd64 架构会优雅报错（见 docker/app-ctl.sh），故此处放开、由运行时把关。
 const APP_OPTIONS: { type: AppType; desc: string; ready: boolean }[] = [
   { type: 'wechat', desc: '默认', ready: true },
+  { type: 'telegram', desc: '仅 x86_64', ready: true },
   { type: 'chromium', desc: '浏览器', ready: true },
   { type: 'custom', desc: '即将支持', ready: false },
 ];
@@ -1723,6 +1725,9 @@ function CreateInstance({ subs, onClose, onDone }: { subs: PanelUser[]; onClose:
         <input className="input" placeholder="实例名称（留空自动命名）" value={name} onChange={(e) => setName(e.target.value)} />
         {appType === 'chromium' && (
           <div className="muted small">Chromium 浏览器随镜像就绪，创建后直接「进入实例」即可（无需下载安装）。</div>
+        )}
+        {appType === 'telegram' && (
+          <div className="muted small">Telegram 官方仅提供 x86_64(amd64) 版本；非 x86_64 主机可创建实例，但进入后无法完成安装。</div>
         )}
         <div className="field-label">允许访问的子账号（管理员默认可访问全部）</div>
         <ChipMultiSelect
